@@ -1,33 +1,28 @@
 import asyncio
 import logging
+from os import getenv
 
-from aiogram import Bot, Dispatcher, F, types
-from aiogram.filters.command import Command
-from bestconfig import Config
+from aiogram import Bot, Dispatcher
+from aiogram.fsm.storage.memory import MemoryStorage
 
-config = Config()
-API_TOKEN = config.get("TELEGRAM_BOT_TOKEN")
-bot = Bot(token=API_TOKEN)
-dp = Dispatcher()
-logging.basicConfig(level=logging.INFO)
-
-
-@dp.message(Command("start"))
-async def send_welcome_message(message: types.Message) -> None:
-    await message.answer("Hello, sweetie!")
-
-
-@dp.message(F.voice)
-async def voice_message_handler(message: types.Message):
-    await message.reply_voice(message.voice.file_id)
-
-
-@dp.message(F.text)
-async def text_message_handler(message: types.Message):
-    await message.reply(message.text)
+from handlers import common, register, user_request
+from utils import create_database
 
 
 async def main():
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+    )
+    await create_database()
+
+    dp = Dispatcher(storage=MemoryStorage())
+    bot = Bot(getenv("TELEGRAM_BOT_TOKEN"))
+
+    dp.include_router(common.router)
+    dp.include_router(user_request.router)
+    dp.include_router(register.router)
+
     await dp.start_polling(bot)
 
 
