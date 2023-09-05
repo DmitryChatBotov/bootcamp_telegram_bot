@@ -6,15 +6,17 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from handlers import common, register, user_request
-from utils import create_database
 
 
 async def main():
     logging.basicConfig(
         level=logging.INFO,
+
+
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     )
-    await create_database()
+    # await create_database()
+    # await fill_db_with_temp_data()
 
     dp = Dispatcher(storage=MemoryStorage())
     bot = Bot(getenv("TELEGRAM_BOT_TOKEN"))
