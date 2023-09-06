@@ -1,14 +1,12 @@
-from pathlib import Path
+from io import BytesIO
 
-import torch
-import whisper
+from faster_whisper import WhisperModel
 
 
 class WhisperWrapper:
-    def __init__(
-        self, model_type: str = "tiny", device: torch.device = torch.device("cpu")
-    ):
-        self._model = whisper.load_model(model_type, device=device)
+    def __init__(self, model_size: str = "base", device="cpu"):
+        self._model = WhisperModel(model_size, device=device, compute_type="int8")
 
-    def __call__(self, audio_filepath: str | Path):
-        return self._model.transcribe(audio_filepath)["text"]
+    def __call__(self, audio_file: BytesIO):
+        segments, info = self._model.transcribe(audio_file, beam_size=5, language="en")
+        return " ".join([segment.text for segment in segments])

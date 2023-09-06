@@ -12,9 +12,9 @@ RUN poetry config installer.max-workers 4 && \
     poetry config virtualenvs.create false && \
     poetry install --no-root --no-interaction --no-ansi
 
-RUN pip install  git+https://github.com/openai/whisper.git
 RUN pip install langchain_experimental
 RUN pip install openai
-RUN pip install pydub
+RUN pip install faster-whisper
+RUN pip install torchaudio==0.13.0
 
 CMD ["python", "main.py"]
