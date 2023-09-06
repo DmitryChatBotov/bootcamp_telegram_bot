@@ -5,7 +5,7 @@ from common.cache import user_agent_dict
 from models.langchain import ConversationAgent, llm
 
 
-def chat_with_llm(user_id, text):
+def chat_with_llm(user_id:int, text:str) -> str:
     if not user_agent_dict.get(user_id, None):
         user_agent_dict[user_id] = ConversationAgent(llm, getenv("SQLITE_FILE"))
     try:
