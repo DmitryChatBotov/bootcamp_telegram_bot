@@ -12,11 +12,13 @@ router = Router()
 
 
 @router.message(F.contact)
-async def process_contact(message: Message) -> None:
+async def register_user(message: Message) -> None:
+    """Register user in db by sharing contact."""
     contact = message.contact
     phone_number = contact.phone_number
+    user_id = message.from_user.id
     name = f"{contact.first_name} {contact.last_name}"
-    user = User(user_id=message.from_user.id, phone=phone_number, name=name)
+    user = User(user_id=user_id, phone=phone_number, name=name)
     try:
         async with Database(getenv("SQLITE_FILE")) as db:
             await register_user(db, user)
@@ -30,5 +32,5 @@ async def process_contact(message: Message) -> None:
     except Exception as err:
         logging.error(err)
         await message.answer(
-            f"Не удалось зарегистрировать пользователя, пожалуйста, попробуйте позже."
+            "User registration failed, please try again later."
         )

@@ -1,5 +1,4 @@
-user_agent_dict = {}
+from cachetools import TTLCache
 
 
-def get_agent(user_id):
-    return user_agent_dict.get(user_id, None)
+agent_cache = TTLCache(maxsize=100, ttl=60)

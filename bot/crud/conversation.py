@@ -1,16 +1,14 @@
 import logging
 from os import getenv
 
-from common.cache import user_agent_dict
+from common.cache import agent_cache
 from models.langchain import ConversationAgent, llm
 
 
-def chat_with_llm(user_id:int, text:str) -> str:
-    if not user_agent_dict.get(user_id, None):
-        user_agent_dict[user_id] = ConversationAgent(llm, getenv("SQLITE_FILE"))
+def chat_with_llm(user_id: int, text: str) -> str:
+    if not agent_cache.get(user_id, None):
+        agent_cache[user_id] = ConversationAgent(llm, getenv("SQLITE_FILE"))
     try:
-        answer = user_agent_dict[user_id](text)
-        return answer
+        return agent_cache[user_id](text)
     except Exception as err:
-        logging.error(err)
-        return str(err)
+        logging.info(err)
