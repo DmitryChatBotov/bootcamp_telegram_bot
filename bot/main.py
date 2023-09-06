@@ -11,8 +11,6 @@ from handlers import common, register, user_request
 async def main():
     logging.basicConfig(
         level=logging.INFO,
-
-
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     )
     # await create_database()

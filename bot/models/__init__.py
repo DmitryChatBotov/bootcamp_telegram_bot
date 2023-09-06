@@ -1,5 +1,3 @@
-#todo: переписать на фабрику
-from langchain import OpenAI
-from .conversation_agent import ConversationAgent
+from .whisper import WhisperWrapper
 
-llm = OpenAI(temperature=0, verbose=True)
+whisper_model = WhisperWrapper()

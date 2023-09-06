@@ -1,4 +1,7 @@
-FROM python:3.10.6-slim
+FROM python:3.10
+
+RUN apt-get update && apt-get install -y \
+    g++ gcc libsndfile1 git ffmpeg
 
 WORKDIR /app
 
@@ -8,5 +11,10 @@ COPY poetry.lock pyproject.toml ./
 RUN poetry config installer.max-workers 4 && \
     poetry config virtualenvs.create false && \
     poetry install --no-root --no-interaction --no-ansi
+
+RUN pip install  git+https://github.com/openai/whisper.git
+RUN pip install langchain_experimental
+RUN pip install openai
+RUN pip install pydub
 
 CMD ["python", "main.py"]

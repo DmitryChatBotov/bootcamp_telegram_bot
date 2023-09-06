@@ -8,8 +8,8 @@ from aiogram.types import (
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
 )
-from crud.user import get_user
 
+from crud.user import get_user
 from db import Database
 
 router = Router()

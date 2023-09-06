@@ -1,9 +1,12 @@
-from typing import Any, Optional, Callable, Awaitable
+from typing import Any, Awaitable, Callable, Optional
 
-from langchain.callbacks.manager import CallbackManagerForToolRun, AsyncCallbackManagerForToolRun
+from langchain.callbacks.manager import (
+    AsyncCallbackManagerForToolRun,
+    CallbackManagerForToolRun,
+)
 from langchain.tools import BaseTool
 
-from models.config import TABLE_INFO, DIALECT
+from models.langchain.config import DIALECT, TABLE_INFO
 
 
 class SQLTool(BaseTool):
@@ -15,7 +18,7 @@ class SQLTool(BaseTool):
     """The asynchronous version of the function."""
 
     def __init__(
-            self, name: str, func: Optional[Callable], description: str, **kwargs: Any
+        self, name: str, func: Optional[Callable], description: str, **kwargs: Any
     ) -> None:
         """Initialize tool."""
         super(SQLTool, self).__init__(
@@ -23,7 +26,7 @@ class SQLTool(BaseTool):
         )
 
     def _run(
-            self, query: str, run_manager: CallbackManagerForToolRun | None = None
+        self, query: str, run_manager: CallbackManagerForToolRun | None = None
     ) -> str:
         """Use the tool."""
         return self.func(
@@ -31,7 +34,7 @@ class SQLTool(BaseTool):
         )
 
     async def _arun(
-            self, query: str, run_manager: AsyncCallbackManagerForToolRun | None = None
+        self, query: str, run_manager: AsyncCallbackManagerForToolRun | None = None
     ) -> str:
         """Use the tool asynchronously."""
         raise NotImplementedError("sql_tool does not support async")
