@@ -54,6 +54,7 @@ async def booking(
             "date": booking_date,
             "time": booking_time,
             "price": service.get("price"),
+            'duration': service.get('duration')
         }
     except Exception as err:
         await db.rollback()

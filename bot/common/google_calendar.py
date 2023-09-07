@@ -1,9 +1,11 @@
+from datetime import datetime
+
+
 def create_google_calendar_link(
-    event_name, start_datetime, end_datetime, details="", location=""
+        event_name: str, start_datetime: datetime, end_datetime: datetime, details="", location=""
 ):
     base_url = "https://www.google.com/calendar/render?action=TEMPLATE"
 
-    # Format the datetime in the required format: YYYYMMDDTHHMMSSZ
     start_str = start_datetime.strftime("%Y%m%dT%H%M%SZ")
     end_str = end_datetime.strftime("%Y%m%dT%H%M%SZ")
 
@@ -13,7 +15,6 @@ def create_google_calendar_link(
 
 
 # Example usage:
-from datetime import datetime
 
 event_name = "Sample Meeting"
 start_datetime = datetime(2023, 9, 5, 14, 0)  # 5th September 2023, 14:00
