@@ -5,6 +5,8 @@ from os import getenv
 
 import pytz
 from aiogram import Bot, F, Router
+from aiogram.enums import ContentType
+from aiogram.filters import or_f
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import Message
@@ -30,14 +32,12 @@ class BookingCancel(StatesGroup):
     confirm = State()
 
 
-@router.message(F.voice)
-async def voice_message_handler(message: Message, bot: Bot):
-    voice_file_info = await bot.get_file(message.voice.file_id)
-    voice_ogg = io.BytesIO()
-    await bot.download_file(voice_file_info.file_path, voice_ogg)
-    transription = whisper_model(voice_ogg)
-    llm_answer = chat_with_llm(message.from_user.id, transription)
-    await message.answer(llm_answer["output"])
+# @router.message(F.voice)
+# async def voice_message_handler(message: Message, bot: Bot, state: FSMContext):
+#
+#     message_data = message.model_dump()
+#     message_data['text'] =transription
+#     await text_message_handler(Message(**message_data), state=state, bot=bot)
 
 
 @router.message(BookingCancel.request, F.text.in_(["Yes", "No"]))
@@ -89,6 +89,8 @@ async def confirm_booking_handler(message: Message, state: FSMContext):
                     service_end_datetime = datetime.combine(
                         service_date, service_end_time.time()
                     )
+                    service_start_datetime = EDT.localize(service_start_datetime)
+                    service_end_datetime = EDT.localize(service_end_datetime)
                     google_calendar_link = create_google_calendar_link(
                         booking_result.get("service_name"),
                         service_start_datetime,
@@ -105,27 +107,38 @@ async def confirm_booking_handler(message: Message, state: FSMContext):
             await message.answer("Please contact your administrator")
 
 
-@router.message(F.text)
-async def text_message_handler(message: Message, state: FSMContext):
-    llm_answer = chat_with_llm(message.from_user.id, message.text)
-    agent_result = llm_answer.get("intermediate_steps")[-1][-1]
-    logging.info(agent_result)
+@router.message(or_f(F.text, F.voice))
+async def text_message_handler(message: Message, state: FSMContext, bot: Bot):
+    text = ""
+    if message.content_type == ContentType.VOICE:
+        voice_file_info = await bot.get_file(message.voice.file_id)
+        voice_ogg = io.BytesIO()
+        await bot.download_file(voice_file_info.file_path, voice_ogg)
+        text = whisper_model(voice_ogg)
+    else:
+        text = message.text
+    llm_answer = chat_with_llm(message.from_user.id, text)
+    logging.info(llm_answer)
+    agent_result = llm_answer.get("intermediate_steps")
+    if agent_result:
+        agent_result = agent_result[-1][-1]
     if isinstance(agent_result, dict):
         match agent_result.get("action"):
             case "Create":
                 await state.update_data(agent_data=agent_result)
-                answer = f"""You want to make a reservation: \n
-                        - {agent_result.get("beauty_service")}\n
-                        - Master - {agent_result.get('master_name', 'Any free master')}\n
-                        - Date - {agent_result.get('booking_date')}\n
-                        - Time - {agent_result.get('booking_time')} \n
-                        That is right?"""
+                answer = (
+                    f"You want to make a reservation: \n"
+                    f"- {agent_result.get('beauty_service')}\n"
+                    f"- Master - {agent_result.get('master_name') if agent_result.get('master_name') else 'Any free master'}\n"
+                    f"- Date - {agent_result.get('booking_date')}\n"
+                    f"- Time - {agent_result.get('booking_time')} \n"
+                    "That is right?"
+                )
                 await message.answer(answer)
                 await state.set_state(Booking.request)
             case "Cancel":
                 await state.update_data(agent_data=agent_result)
-                answer = f"""You want to cancel a reservation\n
-                            That is right?"""
+                answer = f"You want to cancel a reservation\n That is right?" ""
                 await message.answer(answer)
                 await state.set_state(BookingCancel.request)
             case _:
