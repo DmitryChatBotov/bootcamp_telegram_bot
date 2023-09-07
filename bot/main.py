@@ -4,7 +4,7 @@ from os import getenv
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-
+from db_utils import create_database, fill_db_with_temp_data
 from handlers import common, register, user_request
 
 

@@ -9,6 +9,7 @@ from langchain.callbacks.manager import (
 )
 from langchain.tools import BaseTool
 
+
 class NerBookingTool(BaseTool):
     name: str
     description: str
@@ -20,20 +21,20 @@ class NerBookingTool(BaseTool):
         )
 
     def _run(
-        self,
-        query: str,
-        run_manager: Optional[CallbackManagerForToolRun] = None
+        self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool."""
-        current_date = datetime.date.today().strftime('%Y-%m-%d')
+        current_date = datetime.date.today().strftime("%Y-%m-%d")
         masters_list = MASTERS_LIST  # TODO: change to db query
         service_list = SERVICE_LIST  # TODO: change to db query
-        result = self.chain.run({
-            "input_text": query,
-            "current_date": current_date,
-            "masters_list": masters_list,
-            "service_list": service_list
-        })
+        result = self.chain.run(
+            {
+                "input_text": query,
+                "current_date": current_date,
+                "masters_list": masters_list,
+                "service_list": service_list,
+            }
+        )
 
         return json.loads(result)
 

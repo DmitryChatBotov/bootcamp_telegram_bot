@@ -3,8 +3,7 @@ from os import getenv
 
 from aiogram import F, Router
 from aiogram.types import Message, ReplyKeyboardRemove
-
-from crud.user import register_user
+from crud.user import register
 from db import Database, get_db
 from schemas.user import User
 
@@ -21,7 +20,7 @@ async def register_user(message: Message) -> None:
     user = User(user_id=user_id, phone=phone_number, name=name)
     try:
         async with Database(getenv("SQLITE_FILE")) as db:
-            await register_user(db, user)
+            await register(db, user)
 
         await message.answer(
             f"Thank you for sharing your contact information!\n"
@@ -31,6 +30,4 @@ async def register_user(message: Message) -> None:
         )
     except Exception as err:
         logging.error(err)
-        await message.answer(
-            "User registration failed, please try again later."
-        )
+        await message.answer("User registration failed, please try again later.")
