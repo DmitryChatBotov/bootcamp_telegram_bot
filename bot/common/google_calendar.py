@@ -2,7 +2,11 @@ from datetime import datetime
 
 
 def create_google_calendar_link(
-        event_name: str, start_datetime: datetime, end_datetime: datetime, details="", location=""
+    event_name: str,
+    start_datetime: datetime,
+    end_datetime: datetime,
+    details="",
+    location="",
 ):
     base_url = "https://www.google.com/calendar/render?action=TEMPLATE"
 
