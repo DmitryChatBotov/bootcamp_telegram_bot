@@ -9,9 +9,7 @@
 | TIMEZONE |     Timezone of docker container      |     Europe/Moscow     |
 
 ## How to launch
-1. Docker method:
+1. Create .env file based on .env.dist in ./bot module. Fill the varaibles.
+2. Run command:
 ```sudo docker compose up --build -d```
-2. Local launch method:
-```poetry install```
-```python bot/main.py```
 
