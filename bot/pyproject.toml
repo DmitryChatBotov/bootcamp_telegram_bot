@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "telegram-bot"
+version = "0.1.0"
+description = ""
+authors = ["starminalush <alica154323@gmail.com>"]
+readme = "README.md"
+packages = [{include = "telegram_bot"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+aiogram = "^3.0.0"
+aiosqlite = "^0.19.0"
+langchain = "^0.0.281"
+torch = "1.13.0"
+pydub = "^0.25.1"
+torchaudio = "0.13.0"
+faster-whisper = "^0.8.0"
+openai = "^0.28.0"
+langchain-experimental = "^0.0.14"
+cachetools = "^5.3.1"
+pytz = "^2023.3.post1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

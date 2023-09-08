@@ -1,0 +1,16 @@
+version: "3.6"
+
+services:
+  tg_bot:
+    restart: unless-stopped
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    env_file:
+      - ./bot/.env
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "10"
+
