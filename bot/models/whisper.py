@@ -4,7 +4,9 @@ from faster_whisper import WhisperModel
 
 
 class WhisperWrapper:
-    def __init__(self, model_size: str = "medium.en", device="cpu"):
+    """Сlass wrapper over Whisper model"""
+
+    def __init__(self, model_size: str = "medium.en", device: str = "cpu"):
         self._model = WhisperModel(model_size, device=device, compute_type="int8")
 
     def __call__(self, audio_file: BytesIO) -> str:

@@ -1,11 +1,13 @@
 import asyncio
 import logging
 from os import getenv
+from pathlib import Path
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
+
 from db_utils import create_database, fill_db_with_temp_data
-from handlers import common, register, user_request
+from handlers import common, register, user_message
 
 
 async def main():
@@ -13,14 +15,15 @@ async def main():
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     )
-    # await create_database()
-    # await fill_db_with_temp_data()
+    if not Path(getenv('SQLITE_FILE')).exists():
+        await create_database()
+        await fill_db_with_temp_data()
 
     dp = Dispatcher(storage=MemoryStorage())
     bot = Bot(getenv("TELEGRAM_BOT_TOKEN"))
 
     dp.include_router(common.router)
-    dp.include_router(user_request.router)
+    dp.include_router(user_message.router)
     dp.include_router(register.router)
 
     await dp.start_polling(bot)

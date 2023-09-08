@@ -2,7 +2,7 @@ import logging
 from os import getenv
 
 from common.cache import agent_cache
-from models.langchain import CustomConversationChain, llm
+from models import CustomConversationChain, llm
 
 
 def chat_with_llm(user_id: int, text: str) -> str:

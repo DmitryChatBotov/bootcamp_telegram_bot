@@ -1,5 +1,7 @@
 FROM python:3.10
 
+ENV TZ=${TIMEZONE}
+
 WORKDIR /app
 
 RUN pip install "poetry==1.4.2"

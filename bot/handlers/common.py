@@ -4,7 +4,8 @@ from os import getenv
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import KeyboardButton, Message, ReplyKeyboardMarkup
-from crud.user import get_user
+
+from crud.user import get as get_user_from_db
 from db import Database
 
 router = Router()
@@ -15,9 +16,7 @@ async def cmd_start(message: Message):
     """Send start message to bot."""
 
     async with Database(getenv("SQLITE_FILE")) as db:
-        user = await get_user(db, message.from_user.id)
-        logging.info(f"user: {user}")
-        if await get_user(db, message.from_user.id):
+        if await get_user_from_db(db=db, user_id=message.from_user.id):
             await message.answer(
                 "Hello! Welcome to Krasota.Hamburg studio. Glad to see you again!"
             )

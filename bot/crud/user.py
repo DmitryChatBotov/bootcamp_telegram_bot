@@ -1,9 +1,15 @@
 import logging
 
+from db import Database
 from schemas.user import User
 
 
-async def register(db, user: User) -> None:
+async def register(db: Database, user: User) -> None:
+    """Register new user in database.
+    Args:
+        db: Database connection.
+        user: User's info.
+    """
     try:
         logging.info(user)
         await db.execute(
@@ -16,9 +22,17 @@ async def register(db, user: User) -> None:
         raise err
 
 
-async def get_user(db, user_id):
+async def get(db: Database, user_id: int) -> User:
+    """Get an existing user from the database.
+    Args:
+        db: Database connection.
+        user_id: User's ID.
+
+    Returns:
+        Info about user.
+    """
     user = await db.execute(f"SELECT * from Clients WHERE id = {user_id}")
     result = await user.fetchone()
     if result:
-        return dict(result)
+        return User(**dict(result))
     return None
