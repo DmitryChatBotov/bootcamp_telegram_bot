@@ -4,6 +4,8 @@ import aiosqlite
 
 
 class Database:
+    """A class for managing asynchronous connections to the database."""
+
     def __init__(self, db):
         self.db = db
 
