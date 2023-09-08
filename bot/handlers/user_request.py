@@ -32,14 +32,6 @@ class BookingCancel(StatesGroup):
     confirm = State()
 
 
-# @router.message(F.voice)
-# async def voice_message_handler(message: Message, bot: Bot, state: FSMContext):
-#
-#     message_data = message.model_dump()
-#     message_data['text'] =transription
-#     await text_message_handler(Message(**message_data), state=state, bot=bot)
-
-
 @router.message(BookingCancel.request, F.text.in_(["Yes", "No"]))
 async def cancel_booking_handler(message: Message, state: FSMContext):
     match message.text:
@@ -54,7 +46,7 @@ async def cancel_booking_handler(message: Message, state: FSMContext):
                         "Unexpected error, please contact your administrator"
                     )
         case "No":
-            await message.answer("Please contact your administrator")
+            await message.answer("I am requesting admin support. He'll be here in a few minutes")
 
 
 @router.message(Booking.request, F.text.in_(["Yes", "No"]))
@@ -104,11 +96,11 @@ async def confirm_booking_handler(message: Message, state: FSMContext):
                         "Unexpected error, please contact your administrator"
                     )
         case "No":
-            await message.answer("Please contact your administrator")
+            await message.answer("I am requesting admin support. He'll be here in a few minutes")
 
 
 @router.message(or_f(F.text, F.voice))
-async def text_message_handler(message: Message, state: FSMContext, bot: Bot):
+async def message_handler(message: Message, state: FSMContext, bot: Bot):
     text = ""
     if message.content_type == ContentType.VOICE:
         voice_file_info = await bot.get_file(message.voice.file_id)
@@ -117,32 +109,31 @@ async def text_message_handler(message: Message, state: FSMContext, bot: Bot):
         text = whisper_model(voice_ogg)
     else:
         text = message.text
-    llm_answer = chat_with_llm(message.from_user.id, text)
-    logging.info(llm_answer)
-    agent_result = llm_answer.get("intermediate_steps")
-    if agent_result:
-        agent_result = agent_result[-1][-1]
-    if isinstance(agent_result, dict):
-        match agent_result.get("action"):
-            case "Create":
-                await state.update_data(agent_data=agent_result)
-                answer = (
-                    f"You want to make a reservation: \n"
-                    f"- {agent_result.get('beauty_service')}\n"
-                    f"- Master - {agent_result.get('master_name') if agent_result.get('master_name') else 'Any free master'}\n"
-                    f"- Date - {agent_result.get('booking_date')}\n"
-                    f"- Time - {agent_result.get('booking_time')} \n"
-                    "That is right?"
-                )
-                await message.answer(answer)
-                await state.set_state(Booking.request)
-            case "Cancel":
-                await state.update_data(agent_data=agent_result)
-                answer = f"You want to cancel a reservation\n That is right?" ""
-                await message.answer(answer)
-                await state.set_state(BookingCancel.request)
-            case _:
-                logging.info("Check your action in llm")
-
-    else:
-        await message.answer(llm_answer["output"])
+    action, llm_answer = chat_with_llm(message.from_user.id, text)
+    match action:
+        case "Booking":
+            await state.update_data(agent_data=llm_answer)
+            match llm_answer.get("action"):
+                case "Create":
+                    answer = (
+                        f"You want to make a reservation: \n"
+                        f"- {llm_answer.get('beauty_service')}\n"
+                        f"- Master - {llm_answer.get('master_name') if llm_answer.get('master_name') else 'Any free master'}\n"
+                        f"- Date - {llm_answer.get('booking_date')}\n"
+                        f"- Time - {llm_answer.get('booking_time')} \n"
+                        "That is right? Type 'Yes' or 'No'"
+                    )
+                    await message.answer(answer)
+                    await state.set_state(Booking.request)
+                case "Cancel":
+                    answer = "You want to cancel a reservation\n That is right? Type 'Yes' or 'No'"
+                    await message.answer(answer)
+                    await state.set_state(BookingCancel.request)
+        case "Exit":
+            await message.answer("We will be glad to see you again!")
+        case "Support":
+            await message.answer(
+                "I am requesting admin support. He'll be here in a few minutes"
+            )
+        case _:
+            await message.answer(llm_answer)

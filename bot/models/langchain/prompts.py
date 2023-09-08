@@ -26,9 +26,7 @@ NLU_TEMPLATE = """
     Answer:
 """
 
-nlu_prompt = PromptTemplate(template=NLU_TEMPLATE, input_variables=[
-    "input"
-])
+nlu_prompt = PromptTemplate(template=NLU_TEMPLATE, input_variables=["input"])
 
 
 SQL_TEMPLATE = """Given an input question, first create a syntactically correct {dialect} query to run, then look at the results of the query and return the answer.
@@ -150,9 +148,7 @@ SERVICE_LIST = """
 - Deep Tissue Massage
 """
 
-ner_prompt = PromptTemplate(template=NER_BOOKING_TEMPLATE, input_variables=[
-    "input_text",
-    "current_date",
-    "masters_list",
-    "service_list"
-])
+ner_prompt = PromptTemplate(
+    template=NER_BOOKING_TEMPLATE,
+    input_variables=["input_text", "current_date", "masters_list", "service_list"],
+)
