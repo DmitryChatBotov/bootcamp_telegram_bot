@@ -7,16 +7,10 @@ from langchain.chains.conversation.memory import ConversationBufferMemory
 from langchain.chat_models.base import BaseChatModel
 from langchain_experimental.sql import SQLDatabaseChain
 
-from models.langchain_agents.prompts import (
-    DIALECT,
-    MASTERS_LIST,
-    SERVICE_LIST,
-    TABLE_INFO,
-    consultant_prompt,
-    ner_prompt,
-    nlu_prompt,
-    sql_prompt,
-)
+from models.langchain_agents.prompts import (DIALECT, MASTERS_LIST,
+                                             SERVICE_LIST, TABLE_INFO,
+                                             consultant_prompt, ner_prompt,
+                                             nlu_prompt, sql_prompt)
 from schemas.conversation_chain import Booking, ChatMessage
 
 

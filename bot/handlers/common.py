@@ -1,12 +1,11 @@
-import logging
 from os import getenv
 
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import KeyboardButton, Message, ReplyKeyboardMarkup
 
-from crud.user import get as get_user_from_db
-from db import Database
+from crm_mock.crud.user import get as get_user_from_db
+from crm_mock.db import Database
 
 router = Router()
 
@@ -24,6 +23,6 @@ async def cmd_start(message: Message):
             button = KeyboardButton(text="Share contact", request_contact=True)
             keyword = ReplyKeyboardMarkup(keyboard=[[button]])
             await message.answer(
-                "Hello! Welcome to Krasota.Hamburg studio. To continue working, please register",
+                "Hello! Welcome to Krasota.Hamburg studio. To continue working, please register.",
                 reply_markup=keyword,
             )

@@ -6,7 +6,7 @@ from pathlib import Path
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from db_utils import create_database, fill_db_with_temp_data
+from crm_mock.db_utils import create_database, fill_db_with_temp_data
 from handlers import common, register, user_message
 
 
@@ -15,7 +15,7 @@ async def main():
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     )
-    if not Path(getenv('SQLITE_FILE')).exists():
+    if not Path(getenv("SQLITE_FILE")).exists():
         await create_database()
         await fill_db_with_temp_data()
 

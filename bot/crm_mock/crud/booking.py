@@ -2,8 +2,8 @@
 import logging
 from datetime import datetime, timedelta
 
-from db import Database
-from schemas.booking import Reservation
+from crm_mock.db import Database
+from crm_mock.schemas.booking import Reservation
 
 
 async def create_reservation(

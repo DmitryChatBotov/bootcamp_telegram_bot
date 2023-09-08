@@ -4,9 +4,9 @@ from os import getenv
 from aiogram import F, Router
 from aiogram.types import Contact, Message, ReplyKeyboardRemove
 
-from crud.user import register
-from db import Database, get_db
-from schemas.user import User
+from crm_mock.crud.user import register
+from crm_mock.db import Database, get_db
+from crm_mock.schemas.user import User
 
 router = Router()
 

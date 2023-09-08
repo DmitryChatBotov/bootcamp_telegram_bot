@@ -11,13 +11,13 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import Message
 
 from common.google_calendar import create_google_calendar_link
-from crud.booking import cancel_reservation, create_reservation
+from crm_mock.crud.booking import cancel_reservation, create_reservation
+from crm_mock.crud.user import get as get_user_from_db
+from crm_mock.db import Database
+from crm_mock.schemas.booking import Reservation
+from crm_mock.schemas.user import User
 from crud.conversation import chat_with_llm
-from crud.user import get as get_user_from_db
-from db import Database
 from models import whisper_model
-from schemas.booking import Reservation
-from schemas.user import User
 
 router = Router()
 
@@ -45,7 +45,7 @@ def _generate_google_calendar_link_by_booking_result(booking_result) -> str:
     )
 
 
-@router.message(BookingCancel.request, F.text == "Yes")
+@router.message(BookingCancel.request, F.text.lower() == "yes")
 async def cancel_booking_handler(message: Message):
     async with Database(getenv("SQLITE_FILE")) as db:
         user: User = await get_user_from_db(db=db, user_id=message.from_user.id)
@@ -57,17 +57,16 @@ async def cancel_booking_handler(message: Message):
             await message.answer("Unexpected error, please contact your administrator.")
 
 
-@router.message(or_f(Booking.request, BookingCancel.request), F.text == "No")
+@router.message(or_f(Booking.request, BookingCancel.request), F.text.lower() == "no")
 async def get_administrator(message: Message):
     await message.answer(
         "I am requesting admin support. He'll be here in a few minutes."
     )
 
 
-@router.message(Booking.request, F.text == "Yes")
+@router.message(Booking.request, F.text.lower() == "yes")
 async def confirm_booking_handler(message: Message, state: FSMContext):
     agent_result = (await state.get_data()).get("agent_data")
-    logging.info(agent_result)
     async with Database(getenv("SQLITE_FILE")) as db:
         user = await get_user_from_db(db=db, user_id=message.from_user.id)
         reservation: Reservation = await create_reservation(
@@ -99,6 +98,7 @@ async def confirm_booking_handler(message: Message, state: FSMContext):
 @router.message(or_f(F.text, F.voice))
 async def message_handler(message: Message, state: FSMContext, bot: Bot):
     message_text = ""
+
     match message.content_type:
         case ContentType.VOICE:
             voice_file_info = await bot.get_file(message.voice.file_id)
@@ -108,9 +108,7 @@ async def message_handler(message: Message, state: FSMContext, bot: Bot):
         case ContentType.TEXT:
             message_text = message.text
 
-    r = chat_with_llm(message.from_user.id, message_text)
-    logging.info(r)
-    action, llm_answer = r
+    action, llm_answer = chat_with_llm(message.from_user.id, message_text)
     match action:
         case "Booking":
             await state.update_data(agent_data=llm_answer)

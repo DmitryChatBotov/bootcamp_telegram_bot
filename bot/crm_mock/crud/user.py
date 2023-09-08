@@ -1,7 +1,7 @@
 import logging
 
-from db import Database
-from schemas.user import User
+from crm_mock.db import Database
+from crm_mock.schemas.user import User
 
 
 async def register(db: Database, user: User) -> None:
@@ -11,7 +11,6 @@ async def register(db: Database, user: User) -> None:
         user: User's info.
     """
     try:
-        logging.info(user)
         await db.execute(
             f"INSERT INTO Clients (id, phone, name) VALUES (?, ?, ?)",
             tuple(user.dict().values()),
